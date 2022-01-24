@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_provider/pages/todos_page.dart';
+import 'package:todo_provider/providers/providers.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,58 +14,45 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<TodoFilter>(
+          create: (context) => TodoFilter(),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        ChangeNotifierProvider<TodoSearch>(
+          create: (context) => TodoSearch(),
+        ),
+        ChangeNotifierProvider<TodoList>(
+          create: (context) => TodoList(),
+        ),
+        ChangeNotifierProxyProvider<TodoList, ActiveTodoCount>(
+          create: (context) => ActiveTodoCount(),
+          update: (BuildContext context, TodoList todoList,
+                  ActiveTodoCount? activeTodoCount) =>
+              activeTodoCount!..update(todoList),
+        ),
+        ChangeNotifierProxyProvider3<TodoFilter, TodoSearch, TodoList,
+            FilteredTodos>(
+          create: (context) => FilteredTodos(),
+          update: (BuildContext context,
+                  TodoFilter todoFilter,
+                  TodoSearch todoSearch,
+                  TodoList todoList,
+                  FilteredTodos? filteredTodos) =>
+              filteredTodos!..update(todoFilter, todoSearch, todoList),
+        )
+      ],
+      child: MaterialApp(
+        title: 'Provider Todo App',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.deepPurple,
+          textTheme: GoogleFonts.openSansTextTheme(Theme.of(context).textTheme),
+        ),
+        home: const TodosPage(),
       ),
     );
   }
