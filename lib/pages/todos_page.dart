@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_provider/models/todo_model.dart';
 import 'package:todo_provider/providers/providers.dart';
 
 class TodosPage extends StatefulWidget {
@@ -17,6 +18,12 @@ class _TodosPageState extends State<TodosPage> {
         appBar: AppBar(
           title: Text('Provider Todo App'),
           elevation: 0.0,
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.refresh),
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -28,6 +35,8 @@ class _TodosPageState extends State<TodosPage> {
               children: [
                 TodoHeader(),
                 CreateTodo(),
+                SizedBox(height: 20.0),
+                SearchAndFilterTodo(),
               ],
             ),
           ),
@@ -86,5 +95,116 @@ class _CreateTodoState extends State<CreateTodo> {
   void dispose() {
     newTodoController.dispose();
     super.dispose();
+  }
+}
+
+class SearchAndFilterTodo extends StatelessWidget {
+  const SearchAndFilterTodo({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextField(
+          decoration: InputDecoration(
+            labelText: 'Search todos',
+            border: InputBorder.none,
+            filled: true,
+            prefixIcon: Icon(Icons.search),
+          ),
+          onChanged: (String? newSearchTerm) {
+            if (newSearchTerm != null) {
+              context.read<TodoSearch>().setSearchTerm(newSearchTerm);
+            }
+          },
+        ),
+        SizedBox(height: 10.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            filterButton(context, Filter.all),
+            filterButton(context, Filter.active),
+            filterButton(context, Filter.completed),
+          ],
+        ),
+        ShowTodos(),
+      ],
+    );
+  }
+
+  Widget filterButton(BuildContext context, Filter filter) {
+    return TextButton(
+      child: Text(
+        filter == Filter.all
+            ? 'All'
+            : filter == Filter.active
+                ? 'Active'
+                : 'Completed',
+        style: TextStyle(
+          fontSize: 18.0,
+          color: textColor(context, filter),
+        ),
+      ),
+      onPressed: () {
+        context.read<TodoFilter>().changeFilter(filter);
+      },
+    );
+  }
+
+  Color textColor(BuildContext context, Filter filter) {
+    final currentFilter = context.watch<TodoFilter>().state.filter;
+    return currentFilter == filter ? Colors.deepPurple : Colors.grey;
+  }
+}
+
+// ! We cannot directly use a listview in a column or SingleChildScroll view
+// ! becuase the scrolling property conflicts.
+// ! therefore, we need to change the scrolling property of the listview by setting the following.
+// ? primary : false
+// ? shrinkWrap : true
+
+class ShowTodos extends StatelessWidget {
+  const ShowTodos({Key? key}) : super(key: key);
+
+  Widget showBackground(int direction) {
+    return Container(
+      margin: const EdgeInsets.all(4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      color: Colors.red,
+      alignment: direction == 0 ? Alignment.centerLeft : Alignment.centerRight,
+      child: Icon(
+        Icons.delete,
+        size: 30.0,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final todos = context.watch<FilteredTodos>().state.filteredTodos;
+    return ListView.separated(
+      shrinkWrap: true,
+      primary: false,
+      itemCount: todos.length,
+      separatorBuilder: (BuildContext context, int index) {
+        return Divider(
+          color: Colors.grey,
+        );
+      },
+      itemBuilder: (BuildContext context, int index) {
+        return Dismissible(
+          key: ValueKey(todos[index].id),
+          background: showBackground(0),
+          secondaryBackground: showBackground(1),
+          onDismissed: (direction) =>
+              context.read<TodoList>().removeTodo(todos[index]),
+          child: Text(
+            todos[index].desc,
+            style: TextStyle(fontSize: 16.0, color: Colors.deepPurpleAccent),
+          ),
+        );
+      },
+    );
   }
 }
