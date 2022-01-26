@@ -15,32 +15,30 @@ class TodosPage extends StatefulWidget {
 class _TodosPageState extends State<TodosPage> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Provider Todo App'),
-          elevation: 0.0,
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.refresh),
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 10.0,
-            ),
-            child: Column(
-              children: [
-                TodoHeader(),
-                CreateTodo(),
-                SizedBox(height: 20.0),
-                SearchAndFilterTodo(),
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Provider Todo App'),
+        elevation: 0.0,
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.refresh),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 20.0,
+            vertical: 10.0,
+          ),
+          child: Column(
+            children: [
+              TodoHeader(),
+              CreateTodo(),
+              SizedBox(height: 20.0),
+              SearchAndFilterTodo(),
+            ],
           ),
         ),
       ),
