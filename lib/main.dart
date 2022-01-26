@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_provider/pages/todos_page.dart';
 import 'package:todo_provider/providers/providers.dart';
+import 'package:todo_provider/utils/test.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,24 +29,21 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<TodoList>(
           create: (context) => TodoList(),
         ),
-        ChangeNotifierProxyProvider<TodoList, ActiveTodoCount>(
-          create: (context) => ActiveTodoCount(
-              intialActiveTodoCount:
-                  context.read<TodoList>().state.todos.length),
-          update: (BuildContext context, TodoList todoList,
-                  ActiveTodoCount? activeTodoCount) =>
-              activeTodoCount!..update(todoList),
+        ProxyProvider<TodoList, ActiveTodoCount>(
+          update: (
+            BuildContext context,
+            TodoList todoList,
+            ActiveTodoCount? _,
+          ) =>
+              ActiveTodoCount(todoList: todoList),
         ),
-        ChangeNotifierProxyProvider3<TodoFilter, TodoSearch, TodoList,
-            FilteredTodos>(
-          create: (context) => FilteredTodos(
-              initialFilteredTodos: context.read<TodoList>().state.todos),
-          update: (BuildContext context,
-                  TodoFilter todoFilter,
-                  TodoSearch todoSearch,
-                  TodoList todoList,
-                  FilteredTodos? filteredTodos) =>
-              filteredTodos!..update(todoFilter, todoSearch, todoList),
+        PP3<TodoFilter, TodoSearch, TodoList, FilteredTodos>(
+          update: (BuildContext context, TodoFilter todoFilter,
+                  TodoSearch todoSearch, TodoList todoList, FilteredTodos? _) =>
+              FilteredTodos(
+                  todoFilter: todoFilter,
+                  todoList: todoList,
+                  todoSearch: todoSearch),
         )
       ],
       child: MaterialApp(
