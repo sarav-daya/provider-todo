@@ -51,7 +51,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.deepPurple,
-          textTheme: GoogleFonts.openSansTextTheme(Theme.of(context).textTheme),
+          textTheme: GoogleFonts.sourceSansProTextTheme(
+              Theme.of(context).primaryTextTheme),
         ),
         home: const TodosPage(),
       ),
