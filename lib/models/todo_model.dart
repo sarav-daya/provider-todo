@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:uuid/uuid.dart';
 
-Uuid uuid = Uuid();
+Uuid uuid = const Uuid();
 
 class Todo extends Equatable {
   final String id;

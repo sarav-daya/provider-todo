@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_provider/pages/todos_page.dart';
 import 'package:todo_provider/providers/providers.dart';
-import 'package:todo_provider/utils/test.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,35 +16,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+      const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<TodoFilter>(
+        StateNotifierProvider<TodoFilter, TodoFilterState>(
           create: (context) => TodoFilter(),
         ),
-        ChangeNotifierProvider<TodoSearch>(
+        StateNotifierProvider<TodoSearch, TodoSearchState>(
           create: (context) => TodoSearch(),
         ),
-        ChangeNotifierProvider<TodoList>(
+        StateNotifierProvider<TodoList, TodoListState>(
           create: (context) => TodoList(),
         ),
-        ProxyProvider<TodoList, ActiveTodoCount>(
-          update: (
-            BuildContext context,
-            TodoList todoList,
-            ActiveTodoCount? _,
-          ) =>
-              ActiveTodoCount(todoList: todoList),
+        StateNotifierProvider<ActiveTodoCount, ActiveTodoCountState>(
+          create: (context) => ActiveTodoCount(),
         ),
-        PP3<TodoFilter, TodoSearch, TodoList, FilteredTodos>(
-          update: (BuildContext context, TodoFilter todoFilter,
-                  TodoSearch todoSearch, TodoList todoList, FilteredTodos? _) =>
-              FilteredTodos(
-                  todoFilter: todoFilter,
-                  todoList: todoList,
-                  todoSearch: todoSearch),
-        )
+        StateNotifierProvider<FilteredTodos, FilteredTodosState>(
+          create: (context) => FilteredTodos(),
+        ),
       ],
       child: MaterialApp(
         title: 'Provider Todo App',
